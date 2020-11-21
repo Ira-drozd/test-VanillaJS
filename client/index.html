@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Form</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div class="container">
+    <form method="post" name="myform">
+
+        <label for="firstname">First name <input type="text" value="" name="firstname" id="firstname"></label>
+
+        <label for="lastname">Last name <input type="text" name="lastname" id="lastname"></label>
+
+        <label for="email">Email <input type="email" name="email" id="email"></label>
+
+        <label for="phone">Phone <input type="tel" name="phone" id="phone"></label>
+
+        <!--    <input type="submit" value="Submit" id="submitForm">-->
+        <div class="wrapper">
+            <p>Sex</p>
+
+            <div class="block">
+                <label>
+                    <input value='Male' name="sex" type="radio"/>
+                    <span>Male</span>
+                </label>
+                <label>
+                    <input value='Female' name="sex" type="radio"/>
+                    <span>Female</span>
+                </label>
+            </div>
+        </div>
+        <div class="wrapper">
+            <p>Skills</p>
+            <label>
+                <input type="checkbox" name="checkbox1" value='HTML'/>
+                <span>HTML</span>
+            </label>
+            <label>
+                <input type="checkbox" name="checkbox2" value='CSS'/>
+                <span>CSS</span>
+            </label>
+            <label>
+                <input type="checkbox" name="checkbox3" value='JavaScript'/>
+                <span>JavaScript</span>
+            </label>
+            <label>
+                <input type="checkbox" name="checkbox4" value='AJAX'/>
+                <span>AJAX</span>
+            </label>
+        </div>
+
+        <div class="wrapper">
+            <p>Department</p>
+            <select name="department" multiple>
+                <option value="FrontEnd">FrontEnd</option>
+                <option value="SalesForce">SalesForce</option>
+                <option value="Sharepoint">Sharepoint</option>
+            </select>
+        </div>
+
+    </form>
+    <button id="submitForm">Submit</button>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
