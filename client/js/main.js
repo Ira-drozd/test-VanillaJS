@@ -1,12 +1,14 @@
-let form = document.forms.myform;
-let elements = form.elements
-let submitButton = document.getElementById('submitForm')
-let urlParams = new URLSearchParams(window.location.search);
+const form = document.forms.aboutForm;
+const elements = form.elements
+const submitButton = document.getElementById('submitForm')
+const redirectButton = document.getElementById('redirect')
+redirectButton.disabled = true
+const urlParams = new URLSearchParams(window.location.search);
 
-file:///E:/Projects/test-just/client/index.html?firstname=qwe&lastname=Ivanov&email=70@gmail.com&phone=+375296666666&sex=Female&skills=CSS|JavaScript&department=SalesForce|Sharepoint
 const getDataURL = (urlParams) => {
-    let formDataURL = {}
-    let paramsEntries = urlParams.entries()
+    const formDataURL = {}
+    const paramsEntries = urlParams.entries()
+
     for (let pair of paramsEntries) {
         if (pair[0] === 'department' || pair[0] === 'skills') {
             formDataURL[pair[0]] = pair[1].split('|')
@@ -25,13 +27,6 @@ const setFormData = (urlParams, elements) => {
             el.value = formDataURL[el.name]
         }
     }
-    if (formDataURL.hasOwnProperty('skills')) {
-        for (let i = 1; i < 5; i++) {
-            if (formDataURL.skills.includes(elements[`checkbox${i}`].value)) {
-                elements[`checkbox${i}`].checked = true
-            }
-        }
-    }
     if (formDataURL.hasOwnProperty('department')) {
         const options = elements.department.options
         for (let i = 0; i < options.length; i++) {
@@ -44,11 +39,18 @@ const setFormData = (urlParams, elements) => {
     if (formDataURL.hasOwnProperty('sex')) {
         elements.sex.value = formDataURL.sex
     }
-
+    if (formDataURL.hasOwnProperty('skills')) {
+        for (let i = 1; i < 5; i++) {
+            if (formDataURL.skills.includes(elements[`checkbox${i}`].value)) {
+                elements[`checkbox${i}`].checked = true
+            }
+        }
+    }
 }
 
 const getSkills = () => {
     let skills = []
+
     for (let i = 1; i < 5; i++) {
         skills.push(elements[`checkbox${i}`].checked && elements[`checkbox${i}`].value)
     }
@@ -57,16 +59,14 @@ const getSkills = () => {
 
 const getDepartment = (options) => {
     let departments = []
+
     for (let i = 0; i < options.length; i++) {
         departments.push(options[i].selected && options[i].value)
     }
     return departments.filter(department => department !== false)
 }
 
-setFormData(urlParams, elements)
-
-const submitForm = elements => {
-    console.log('department', elements.department.options[0])
+const getFormData = () => {
     let formData = {
         firstname: elements.firstname.value,
         lastname: elements.lastname.value,
@@ -77,25 +77,42 @@ const submitForm = elements => {
         department: getDepartment(elements.department.options)
     }
 
-    console.log(formData)
+    Object.keys(formData).forEach((el) => (!formData[el].length) && delete formData[el]);
 
-
-    let newUrlParams = new URLSearchParams('')
-
-    for (let el in formData) {
-        if (formData[el].length > 0) {
-            if (Array.isArray(formData[el])) {
-                newUrlParams.append(el, formData[el].join('|'))
-            } else {
-                newUrlParams.append(el, formData[el].toString())
-            }
-        }
-    }
-
-    const newPath = 'file://' + window.location.pathname + '?' + decodeURIComponent(newUrlParams.toString())
-    console.log(newPath)
-    console.log(window.location.pathname)
-    window.location.replace(newPath);
+    return formData
 }
 
-submitButton.addEventListener('click', submitForm.bind(this, elements))
+const redirectToNewPath = (search) => {
+    window.location.replace(search)
+}
+
+const submitHandler = async () => {
+    try {
+        const form = getFormData()
+
+        const response = await fetch('/api/form', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(form)
+        })
+
+        const data = await response.json()
+
+        console.log(data.message, data.form)
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Something went wrong')
+        } else {
+            document.getElementById("about-form").reset();
+            redirectButton.disabled = false
+            redirectButton.addEventListener('click', redirectToNewPath.bind(this, data.newPath))
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+setFormData(urlParams, elements)
+submitButton.addEventListener('click', submitHandler)
